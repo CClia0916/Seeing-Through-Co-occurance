@@ -4,10 +4,6 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 
-"""
-并行 使用两层1d卷积，卷积核大小依次为5,3
-"""
-
 
 class Local_Relational_Block(nn.Module):
 
@@ -132,7 +128,6 @@ class Global_Relational_Block(nn.Module):
         self.response_lambda = response_lambda
         self.response_mode = response_mode
 
-        # ===== 新增：频率消融模式 =====
         self.freq_ablation = 'all'
 
         self.q = nn.Linear(dim, dim)
@@ -297,7 +292,6 @@ class Global_Relational_Block(nn.Module):
         mid_freq_out = self._temporal_reweight(mid_freq_time)
         high_freq_out = self._temporal_reweight(high_freq_time)
 
-        # ===== 新增：频率消融作用点 =====
         low_freq_out, mid_freq_out, high_freq_out = self._apply_freq_ablation(
             low_freq_out, mid_freq_out, high_freq_out
         )
