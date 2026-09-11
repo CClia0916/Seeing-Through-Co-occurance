@@ -26,7 +26,6 @@ parser = argparse.ArgumentParser()
 
 """
 ########
-训练前被初始化的参数
     -dataset charades
     -mode rgb
     -model MultiDimensionalDecoupling
@@ -61,7 +60,6 @@ parser.add_argument('-use_txt_ctx', type=str2bool, default='False')
 parser.add_argument('-cooccur_ablation', type=str, default='full',
                     choices=['full', 'no_prior', 'no_uncertainty', 'no_relation', 'no_aux'])
 
-# ===== 新增：频率消融 =====
 parser.add_argument('-freq_ablation', type=str, default='all',
                     choices=['all', 'low_only', 'mid_only', 'high_only', 'no_low', 'no_mid', 'no_high'])
 
@@ -81,7 +79,6 @@ parser.add_argument('-save_every_epoch', type=str2bool, default='False')
 parser.add_argument('-save_val_data', type=str2bool, default='True')
 parser.add_argument('-save_latest_checkpoint', type=str2bool, default='True')
 
-# 固定主干为 no_text；如需以后扩展，可改成 choices=['no_text', 'full']
 parser.add_argument('-semantic_backbone', type=str, default='no_text',
                     choices=['no_text', 'full'])
 parser.add_argument('-annotation_path', type=str, default='./data/charades.json')
@@ -829,12 +826,12 @@ if __name__ == '__main__':
     COOCCUR_PATH = args.cooccur_cache
     os.makedirs(os.path.dirname(os.path.abspath(COOCCUR_PATH)), exist_ok=True)
     if not os.path.exists(COOCCUR_PATH):
-        print("Charades共现矩阵不存在，开始统计...")
+        print("Charades matrix is no exist")
         _, cooccur_prob = count_time_step_cooccurrence(
             dataloaders['train'], num_classes=classes, save_path=COOCCUR_PATH
         )
     else:
-        print("加载已有的Charades共现矩阵...")
+        print("Loading existing Charades matrix...")
         cooccur_data = torch.load(COOCCUR_PATH, map_location='cpu')
         cooccur_prob = cooccur_data["cooccur_prob"]
 
