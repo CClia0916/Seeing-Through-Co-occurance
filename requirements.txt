@@ -1,0 +1,5 @@
+numpy>=1.21,<3
+scikit-learn>=1.0,<2
+sentence-transformers>=2.2,<4
+torch>=1.9,<3
+tqdm>=4.60,<5
