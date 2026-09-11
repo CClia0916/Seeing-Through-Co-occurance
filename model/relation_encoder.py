@@ -2,11 +2,6 @@ from torch.nn.init import trunc_normal_
 import math
 import torch.nn as nn
 
-"""
-这里在MLP模块中直接使用两个linear层，舍弃了卷积层（该结构源自Swin）
-"""
-
-
 class Global_Relational_Block_Win(nn.Module):
     def __init__(self, inter_token, dim, num_heads=8, norm_layer=nn.LayerNorm, hidden_tokens=None, act_layer=nn.GELU,
                  drop=0., k=4):
@@ -61,7 +56,6 @@ class Global_Relational_Block_Win(nn.Module):
     def forward(self, x):
         K = self.k
         B, D, T = x.shape  # B, D, T
-        # 窗口切片
         x = x.reshape(B, K, D // K, T)
 
         # attn1
@@ -80,7 +74,6 @@ class Global_Relational_Block_Win(nn.Module):
         x = self.proj1(x)
         x = shortcut1 + x  # B, K, D//K, T
 
-        # MLP_CONV2D_1
         shortcut_mlp1 = x
         x = self.linear1(x)  # B, K, D//K, T
         x = self.act(x)
@@ -89,11 +82,9 @@ class Global_Relational_Block_Win(nn.Module):
         x = self.drop(x)
         x = shortcut_mlp1 + x
 
-        # # 特征重组
         x = x.reshape(B, K, K, D // (K * K), T)
         x = x.permute(0, 2, 1, 3, 4).flatten(2, 3)
 
-        # attn2
         shortcut2 = x
         x = self.norm2(x.transpose(2, 3)).transpose(2, 3)
         q2 = self.q2(x).reshape(B, K, D // K, self.num_heads, T // self.num_heads).permute(0, 1, 3, 2,
@@ -109,7 +100,7 @@ class Global_Relational_Block_Win(nn.Module):
         x = self.proj2(x)
         x = shortcut2 + x  # B, K, D//K, T
 
-        # MLP_CONV2D_2
+
         shortcut_mlp2 = x
         x = self.linear3(x)  # B, K, D//K, T
         x = self.act(x)
